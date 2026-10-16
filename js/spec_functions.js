@@ -3,17 +3,17 @@ window.mill_toggle = function() {
     const chocolateProd = document.getElementById("chocolate_prod");
     const cpsText = document.getElementById("cps");
     if (window.mill_active) {
-        cpsText.textContent = "candies per second: " + (cps * 2);
+        cpsText.textContent = window.t("candiesPerSecond", { count: cps * 2 });
     }
     else if (!window.mill_active) {
-        cpsText.textContent = "candies per second: " + cps;
+        cpsText.textContent = window.t("candiesPerSecond", { count: cps });
     }
-    window.clickSound.play().catch(err => console.error(err));
+    window.playSound(window.clickSound);
     if (!window.mill_active) {
-        chocolateProd.textContent = "chocolates per second: " + chocolate_cps;
+        chocolateProd.textContent = window.t("chocolateProduction", { count: chocolate_cps });
     }
     else if (window.mill_active) {
-        chocolateProd.textContent = "chocolates per second: " + chocolate_cps * 0.2;
+        chocolateProd.textContent = window.t("chocolateProduction", { count: chocolate_cps * 0.2 });
     }
 }
 

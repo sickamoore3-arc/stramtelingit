@@ -63,8 +63,8 @@ window.unlock_figure = function (upg, figure_stage) {
     const nextStage = figure_stage + 1;
     const currentFigure = document.getElementById(String(figure_stage));
     const nextFigure = document.getElementById(String(nextStage));
-    if (nextStage > 6){
-        window.hi.play().catch(err => console.error(err));
+    if (nextStage === 7) {
+        window.playSound(window.hi);
     }
 
     if (currentFigure && nextFigure) {
