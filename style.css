@@ -1,5 +1,6 @@
 body {
 		background-color: black;
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	}
 	p { color:white; }
 	pre  { color:white; }
