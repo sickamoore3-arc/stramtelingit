@@ -7,6 +7,7 @@ window.chocolates = 0;
 window.chocolate_men = 0;
 
 let cps = 0.5;
+window.getCps = () => cps;
 window.chocolate_cps = 0;
 
 let progressed = false;
@@ -26,9 +27,52 @@ window.forest_found = false;
 window.figure_stage = 0;
 
 window.clickSound = new Audio("click.wav");
+window.buttonRolloverSound = new Audio("buttonrollover.wav");
+window.quickSettingsClickSound = new Audio("quicksettingsclick.wav");
+window.tadaSound = new Audio("tada_1.mp3");
 window.hi = new Audio("WAPP-Hi.wav");
 
+const insufficientFundsAudioContext = new AudioContext();
+const insufficientFundsGain = insufficientFundsAudioContext.createGain();
+insufficientFundsGain.connect(insufficientFundsAudioContext.destination);
+window.insufficientFundsGain = insufficientFundsGain;
+const insufficientFundsSoundReady = fetch("insufficient funds.wav")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to load insufficient funds.wav: " + response.status);
+        }
+        return response.arrayBuffer();
+    })
+    .then(data => insufficientFundsAudioContext.decodeAudioData(data));
+
+function playInsufficientFundsSound(message) {
+    if (!window.soundEnabled) {
+        alert(message);
+        return;
+    }
+    const resume = insufficientFundsAudioContext.resume();
+    Promise.all([insufficientFundsSoundReady, resume]).then(([buffer]) => {
+        const source = insufficientFundsAudioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(insufficientFundsGain);
+        source.start();
+        window.setTimeout(() => alert(message), 0);
+    }).catch(err => {
+        console.error(err);
+        alert(message);
+    });
+}
+
 setInterval(addCps, 1000);
+
+document.addEventListener("mouseover", function(event) {
+    const button = event.target.closest("button");
+    if (!button || (event.relatedTarget instanceof Node && button.contains(event.relatedTarget))) {
+        return;
+    }
+
+    window.playSound(window.buttonRolloverSound);
+});
 
 // The callback function
 function addCps() {
@@ -40,11 +84,11 @@ function addCps() {
 
     candies += total_cps2;
     if (candies >= 1000 && !past_1000) {
-        alert("you have accumulated enough candies to attract new people to your domain");
+        alert(window.t("alertThreshold"));
         past_1000 = true;
     }
     var candieText = document.getElementById("candieText");
-    candieText.textContent = "you have " + Math.round(candies) + " candies";
+    candieText.textContent = window.t("candiesCount", { count: Math.round(candies) });
 
     if (window.farm_active) {
         var totalCps = chocolate_cps;
@@ -63,8 +107,8 @@ function addCps() {
         chocolates += totalCps;
         var chocolateText = document.getElementById("chocolate_count");
         var chocolateProd = document.getElementById("chocolate_prod");
-        chocolateProd.textContent = "chocolates per second: " + totalCps;
-        chocolateText.textContent = "you have " + Math.round(chocolates) + " chocolates";
+        chocolateProd.textContent = window.t("chocolateProduction", { count: totalCps });
+        chocolateText.textContent = window.t("chocolateCount", { count: Math.round(chocolates) });
     }
 
     window.unlock_upgrades(generalUpgrades);
@@ -101,29 +145,18 @@ function addCps() {
 }
 
 function playClickSound() {
-    window.clickSound.currentTime = 0;
-    window.clickSound.play().catch(err => console.error(err));
+    window.playSound(window.clickSound);
 }
-
-
-
-document.addEventListener("click", function unlockAudio() {
-    window.clickSound.play().then(() => {
-        window.clickSound.pause();
-        window.clickSound.currentTime = 0;
-        document.removeEventListener("click", unlockAudio);
-    }).catch(err => console.error(err));
-}, { once: true });
 
 
 
 function buyUpg(upg) {
-    playClickSound();
     if (candies >= upg.cost) {
+        playClickSound();
         try {
              upg.buy();
         } catch (error) {
-              alert("An error occurred while buying the upgrade: " + error.message);
+              alert(window.t("buyError", { message: error.message }));
               return;
         }
         const button = document.getElementById(upg.name);
@@ -135,17 +168,19 @@ function buyUpg(upg) {
 
         console.log("bought!");
     } else {
-        alert("Not enough candies to buy " + upg.name);
+        playInsufficientFundsSound(window.t("notEnoughCandies", {
+            name: window.translateUpgradeName(upg.name)
+        }));
     }
 }
 
 function buyUpgChoc(upg) {
-    playClickSound();
     if (chocolates >= upg.cost) {
+        playClickSound();
         try {
              upg.buy();
         } catch (error) {
-              alert("An error occurred while buying the upgrade: " + error.message);
+              alert(window.t("buyError", { message: error.message }));
               return;
         }
         const button = document.getElementById(upg.name);
@@ -157,7 +192,9 @@ function buyUpgChoc(upg) {
 
         console.log("bought!");
     } else {
-        alert("Not enough chocolates to buy " + upg.name);
+        playInsufficientFundsSound(window.t("notEnoughChocolates", {
+            name: window.translateUpgradeName(upg.name)
+        }));
     }
 }
 
@@ -175,7 +212,7 @@ class upgrade {
         cps += this.cps;
         progressed = true;
         document.getElementById("candieText").textContent =
-            "you have " + Math.round(candies) + " candies";
+            window.t("candiesCount", { count: Math.round(candies) });
     }
 }
 
@@ -191,7 +228,7 @@ class specializedUpgrade {
         candies -= this.cost;
         progressed = true;
         document.getElementById("candieText").textContent =
-            "you have " + Math.round(candies) + " candies";
+            window.t("candiesCount", { count: Math.round(candies) });
         if (this.onBuy) {
             this.onBuy(this);
         }
@@ -210,7 +247,7 @@ class specializedUpgradeChocolate {
         chocolates -= this.cost;
         progressed = true;
         document.getElementById("chocolate_count").textContent =
-            "chocolates: " + Math.round(chocolates);
+            window.t("chocolateShortCount", { count: Math.round(chocolates) });
         if (this.onBuy) {
             this.onBuy(this);
         }
@@ -249,7 +286,7 @@ window.addEventListener('beforeunload', function (e) {
 
 
 window.win = function() {
-    alert("you have won the game! you have unlocked all upgrades and found all secrets. congratulations!");
+    alert(window.t("winAlert"));
     const winSec= document.getElementById("end");
     const farm= document.getElementById("farm");
     if (winSec) {
@@ -262,21 +299,23 @@ window.win = function() {
 
 window.buyWIN = function() {
     if (candies >= 49999) {
+        window.playSound(window.tadaSound);
         candies -= 49999;
         window.win();
     } else {
-        alert("Not enough candies to buy the win condition.");
+        playInsufficientFundsSound(window.t("notEnoughWin"));
     }
 }
 
 window.toggleDebug = function() {
+    window.playSound(window.quickSettingsClickSound);
     window.debug = !window.debug;
     if (window.debug) {
-        alert("debug mode enabled. this is used by devs to test out new features without waiting hours and is not meant for normal gameplay");
+        alert(window.t("debugEnabled"));
         cps = 300000;
         window.chocolate_cps = 300000;
     } else {
-        alert("debug mode disabled.");
+        alert(window.t("debugDisabled"));
     }
     
 }

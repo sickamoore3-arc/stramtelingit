@@ -11,7 +11,7 @@
 <body>
 
     <header>
-        <h1 id="candieText">you have 0 candies test etss test</h1>
+        <h1 id="candieText">you have 0 candies</h1>
     </header>
 
     <main>
@@ -36,7 +36,7 @@
                 | |      |   *|     | |    
                 | |______|____|_____| | 
                 
-                    chocolate farm
+                    <span data-i18n="farmName">chocolate farm</span>
             </pre>
 
             <pre id="farm_mill" style="display: none;">
@@ -54,7 +54,7 @@
   |     l      |  | |      |   *|     | |    
   |            |  | |______|____|_____| | 
   ‾‾‾‾‾‾‾‾‾‾‾‾‾‾  
-                      chocolate farm
+                      <span data-i18n="farmName">chocolate farm</span>
             </pre>
 
         </div>
@@ -64,19 +64,18 @@
             <p id="chocolate_count">chocolates: 0</p>
             <select id="boost" onchange="window.boost_select(this.value)" hidden>
                             
-              <option value="none">none</option>
-              <option value="bananas" id="bananas" hidden>banana flavoured candy</option>
-              <option value="cherry" id="cherry" hidden>cherry flavoured candy</option>
+              <option value="none" data-i18n="boostNone">none</option>
+              <option value="bananas" id="bananas" hidden data-i18n="boostBanana">banana flavoured candy</option>
+              <option value="cherry" id="cherry" hidden data-i18n="boostCherry">cherry flavoured candy</option>
             </select>
-            <label for="boost" hidden id="boostlabel">fertilizer</label>
+            <label for="boost" hidden id="boostlabel" data-i18n="fertilizer">fertilizer</label>
             <div style="display: none;" id="mill_act_sec">
                 <input type="checkbox" id="mill_activate" value="no" onchange="window.mill_toggle()">
-                <label for="mill_activate">activate mill</label>
+                <label for="mill_activate" data-i18n="activateMill">activate mill</label>
             </div>
         </div>
         <div class="box" id="kevin">
             <pre id="0" style="display: flex;">
-
             </pre>
             <pre id="1" style="display: none;">
              .
@@ -101,7 +100,7 @@
             _____    
            / _ _ \  
             |# #|
-            | _ |    kevin the candy merchant
+            | _ |    <span data-i18n="merchantName">kevin the candy merchant</span>
             ‾|‾|‾
              | |
           ‾‾‾‾‾‾‾‾‾
@@ -123,17 +122,17 @@
                  |   |
                  |_|_|
 
-            chocolate men
+            <span data-i18n="chocolateMenTitle">chocolate men</span>
 
             </pre>
             <p id="men">1</p>
             <p id="miners">0</p>
             <p id="lumberjack">0</p>
             
-            <button id="buy_men" onclick="window.buy_men()">buy chocolate men</button>
+            <button id="buy_men" onclick="window.buy_men()" data-i18n="buyMen">buy chocolate men</button>
 
-            <button id="buy_miner" onclick="window.buy_miner()">buy miner</button>
-            <button id="buy_lumberjack" onclick="window.buy_lumberjack()">buy
+            <button id="buy_miner" onclick="window.buy_miner()" data-i18n="buyMiner">buy miner</button>
+            <button id="buy_lumberjack" onclick="window.buy_lumberjack()" data-i18n="buyLumberjack">buy
         </div>
         <div class="box" id="locations" hidden>
             <pre>
@@ -151,7 +150,7 @@
                 |  |
                 |  |
         
-            lollipop forest
+            <span data-i18n="forestName">lollipop forest</span>
             </pre>
         </div>
 
@@ -167,9 +166,9 @@
         |              |
         |     (0)      |
         ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-            the box
+            <span data-i18n="boxName">the box</span>
             </pre>
-            <button onclick="window.buyWIN()">open the box?</button>
+            <button onclick="window.buyWIN()" data-i18n="openBox">open the box?</button>
         </div>
     </section>
 
@@ -184,7 +183,7 @@
                 |/  ‾‾‾  \|
 
 
-                 you won!
+                 <span data-i18n="youWon">you won!</span>
 
             </pre>
 
@@ -193,7 +192,32 @@
 
     <footer>
         <p>&copy; 2026 ඞ</p>
-        <button onclick="window.toggleDebug()">toggle debug</button>
+        <button id="debugToggle" onclick="window.toggleDebug()" data-i18n="debugButton">toggle debug</button>
+        <button id="settingsButton" type="button" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
+        <section id="settingsPanel" aria-labelledby="settingsTitle" hidden>
+            <h2 id="settingsTitle" data-i18n="settingsTitle">Settings</h2>
+            <label for="languageSelect" data-i18n="languageLabel">Language</label>
+            <select id="languageSelect">
+                <option value="en">English</option>
+                <option value="ta">Tamil</option>
+                <option value="hi">Hindi</option>
+                <option value="es">Español</option>
+                <option value="zh">Chinese</option>
+                <option value="ja">Japanese</option>
+                <option value="ar">Arabic</option>
+                <option value="ru">Russian</option>
+            </select>
+            <div>
+                <input type="checkbox" id="soundToggle">
+                <label for="soundToggle" data-i18n="soundLabel">Sound</label>
+            </div>
+            <div>
+                <input type="checkbox" id="potatoToggle">
+                <label for="potatoToggle" data-i18n="potatoLabel">Potato mode</label>
+                <span data-i18n="potatoDescription">Reduce visual effects for slower devices.</span>
+            </div>
+            <button id="closeSettingsButton" type="button" data-i18n="closeSettings">Close</button>
+        </section>
     </footer>
 
     <!-- Link to external JavaScript file -->
@@ -203,5 +227,6 @@
     <script src="js/unlock.js"></script>
     <script src="js/men.js"></script>
     <script src="script.js"></script>
+    <script src="js/settings.js"></script>
 </body>
 </html>

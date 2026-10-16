@@ -13,9 +13,47 @@ body {
 	}
 	body { image-rendering: pixelated;}
 
+	button {
+	  transition: background-color 120ms ease;
+	}
+
+	button:hover {
+	  background-color: #b8b8b8;
+	}
+
+	#settingsPanel {
+	  margin-top: 12px;
+	  padding: 12px;
+	  border: 1px solid #7700f7;
+	}
+
+	#settingsPanel label,
+	#settingsPanel select,
+	#settingsPanel span {
+	  margin-inline-end: 8px;
+	}
+
+	html[dir="rtl"] pre {
+	  direction: ltr;
+	  text-align: left;
+	}
+
+	.potato-mode *,
+	.potato-mode *::before,
+	.potato-mode *::after {
+	  animation: none !important;
+	  box-shadow: none !important;
+	  text-shadow: none !important;
+	  transition: none !important;
+	}
+
+	.potato-mode {
+	  image-rendering: auto;
+	}
 
 
-.flex-container {
+
+	.flex-container {
   display: flex;
   gap: 15px; /* Adds clean spacing between the boxes without breaking layouts */
   max-width: 900px;
@@ -30,4 +68,3 @@ body {
   background: var(--surface);
   box-shadow: 0 8px 20px rgb(0 0 0 / 20%);
 }
-
