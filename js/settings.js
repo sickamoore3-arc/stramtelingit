@@ -26,8 +26,9 @@ const messages = {
     settingsTitle: ["Settings", "அமைப்புகள்", "सेटिंग्स", "Ajustes", "设置", "設定", "الإعدادات", "Настройки"],
     languageLabel: ["Language", "மொழி", "भाषा", "Idioma", "语言", "言語", "اللغة", "Язык"],
     soundLabel: ["Sound", "ஒலி", "ध्वनि", "Sonido", "声音", "サウンド", "الصوت", "Звук"],
+    darkModeLabel: ["Dark mode", "இருண்ட பயன்முறை", "डार्क मोड", "Modo oscuro", "深色模式", "ダークモード", "الوضع الداكن", "Тёмный режим"],
     potatoLabel: ["Potato mode", "உருளைக்கிழங்கு பயன்முறை", "आलू मोड", "Modo patata", "低配模式", "低負荷モード", "وضع الأجهزة الضعيفة", "Режим для слабых устройств"],
-    potatoDescription: ["Reduce visual effects for slower devices.", "மெதுவான சாதனங்களில் காட்சி விளைவுகளைக் குறைக்கவும்.", "धीमे उपकरणों पर दृश्य प्रभाव कम करें।", "Reduce los efectos visuales en dispositivos lentos.", "减少低性能设备上的视觉效果。", "低速端末の視覚効果を減らします。", "تقليل المؤثرات المرئية للأجهزة البطيئة.", "Уменьшает визуальные эффекты на слабых устройствах."],
+    potatoDescription: ["Reduce visual effects and pause game updates while this tab is hidden.", "காட்சி விளைவுகளைக் குறைத்து, இந்தத் தாவல் மறைக்கப்படும்போது விளையாட்டு புதுப்பிப்புகளை இடைநிறுத்தவும்.", "दृश्य प्रभाव कम करें और टैब छिपा होने पर गेम अपडेट रोकें।", "Reduce los efectos visuales y pausa el juego mientras esta pestaña esté oculta.", "减少视觉效果，并在此标签页隐藏时暂停游戏更新。", "視覚効果を減らし、このタブが非表示の間はゲームの更新を一時停止します。", "تقليل المؤثرات المرئية وإيقاف تحديثات اللعبة مؤقتًا عند إخفاء علامة التبويب.", "Уменьшает визуальные эффекты и приостанавливает игру, пока вкладка скрыта."],
     closeSettings: ["Close", "மூடு", "बंद करें", "Cerrar", "关闭", "閉じる", "إغلاق", "Закрыть"],
     debugButton: ["toggle debug", "பிழைத்திருத்தத்தை மாற்று", "डिबग टॉगल करें", "alternar depuración", "切换调试模式", "デバッグ切替", "تبديل وضع التصحيح", "переключить отладку"],
     notEnoughCandies: ["Not enough candies to buy {name}", "{name} வாங்க போதுமான மிட்டாய்கள் இல்லை", "{name} खरीदने के लिए पर्याप्त कैंडी नहीं हैं", "No tienes caramelos suficientes para comprar {name}", "糖果不足，无法购买{name}", "{name}を買うためのキャンディが足りません", "لا تملك حلوى كافية لشراء {name}", "Недостаточно конфет для покупки «{name}»"],
@@ -92,6 +93,7 @@ let currentLanguage = languageCodes.includes(getSetting("candiebank-language", "
     : "en";
 window.soundEnabled = getSetting("candiebank-sound", "true") !== "false";
 let potatoModeEnabled = getSetting("candiebank-potato-mode", "false") === "true";
+let darkModeEnabled = getSetting("candiebank-dark-mode", "true") !== "false";
 
 function languageIndex() {
     return languageCodes.indexOf(currentLanguage);
@@ -169,7 +171,10 @@ window.setGameSoundEnabled = function(enabled) {
         window.clickSound,
         window.buttonRolloverSound,
         window.quickSettingsClickSound,
+        window.settingsClickSound,
         window.tadaSound,
+        window.warnedSound,
+        window.ravenholmSound,
         window.hi
     ].forEach(audio => {
         audio.muted = !enabled;
@@ -181,19 +186,35 @@ function setPotatoMode(enabled) {
     potatoModeEnabled = enabled;
     document.body.classList.toggle("potato-mode", enabled);
     saveSetting("candiebank-potato-mode", String(enabled));
+    window.updateGameTick();
+}
+
+function setDarkMode(enabled) {
+    darkModeEnabled = enabled;
+    document.documentElement.dataset.theme = enabled ? "dark" : "light";
+    saveSetting("candiebank-dark-mode", String(enabled));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     const languageSelect = document.getElementById("languageSelect");
     const soundToggle = document.getElementById("soundToggle");
+    const darkModeToggle = document.getElementById("darkModeToggle");
     const potatoToggle = document.getElementById("potatoToggle");
     const settingsButton = document.getElementById("settingsButton");
     const settingsPanel = document.getElementById("settingsPanel");
     const closeSettingsButton = document.getElementById("closeSettingsButton");
+    const dontPressButton = document.getElementById("dontPressButton");
+    const dontPressDialog = document.getElementById("dontPressDialog");
+    const dontPressYes = document.getElementById("dontPressYes");
+    const dontPressNo = document.getElementById("dontPressNo");
+    const dontPressResponse = document.getElementById("dontPressResponse");
+    const dontPressConsequence = document.getElementById("dontPressConsequence");
 
     languageSelect.value = currentLanguage;
     soundToggle.checked = window.soundEnabled;
+    darkModeToggle.checked = darkModeEnabled;
     potatoToggle.checked = potatoModeEnabled;
+    setDarkMode(darkModeEnabled);
     setPotatoMode(potatoModeEnabled);
     window.setGameSoundEnabled(window.soundEnabled);
     applyLanguage();
@@ -208,6 +229,10 @@ document.addEventListener("DOMContentLoaded", () => {
         window.setGameSoundEnabled(soundToggle.checked);
     });
 
+    darkModeToggle.addEventListener("change", () => {
+        setDarkMode(darkModeToggle.checked);
+    });
+
     potatoToggle.addEventListener("change", () => {
         setPotatoMode(potatoToggle.checked);
     });
@@ -220,8 +245,37 @@ document.addEventListener("DOMContentLoaded", () => {
         window.playSound(window.quickSettingsClickSound);
         setSettingsOpen(settingsPanel.hidden);
     });
+    settingsPanel.addEventListener("click", event => {
+        if (event.target.closest("button, input, select")) {
+            window.playSound(window.settingsClickSound);
+        }
+    });
     closeSettingsButton.addEventListener("click", () => {
         setSettingsOpen(false);
         settingsButton.focus();
+    });
+
+    dontPressButton.addEventListener("click", () => {
+        window.playSound(window.quickSettingsClickSound);
+        dontPressResponse.hidden = true;
+        dontPressDialog.hidden = false;
+        dontPressYes.focus();
+    });
+    dontPressNo.addEventListener("click", () => {
+        dontPressDialog.hidden = true;
+        dontPressResponse.hidden = false;
+        dontPressButton.focus();
+    });
+    dontPressYes.addEventListener("click", () => {
+        dontPressDialog.hidden = true;
+        dontPressConsequence.hidden = false;
+        window.playSound(window.warnedSound);
+        window.playSound(window.ravenholmSound);
+    });
+    dontPressDialog.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            dontPressDialog.hidden = true;
+            dontPressButton.focus();
+        }
     });
 });
