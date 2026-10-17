@@ -1,14 +1,29 @@
+:root {
+	color-scheme: dark;
+	--page-background: #000;
+	--text-color: #fff;
+	--surface: #111;
+}
+
+:root[data-theme="light"] {
+	color-scheme: light;
+	--page-background: #fff;
+	--text-color: #171717;
+	--surface: #f4f4f4;
+}
+
 body {
-		background-color: black;
-		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-	}
-	p { color:white; }
-	pre  { color:white; }
-	span { color:white; }
-	h1 { color:white; }
-	h2 { color:white; }
-	h3 { color:white; }
-	label { color:white; }
+	background-color: var(--page-background);
+	color: var(--text-color);
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+	p,
+	pre,
+	span,
+	h1,
+	h2,
+	h3,
+	label { color: var(--text-color); }
 	.clicki-img:hover {
 		cursor : pointer;
 	}
@@ -68,4 +83,69 @@ body {
   border: 1px solid #7700f7;
   background: var(--surface);
   box-shadow: 0 8px 20px rgb(0 0 0 / 20%);
+}
+
+.dont-press-response {
+  display: inline-block;
+  margin-inline-start: 8px;
+}
+
+.dont-press-response[hidden] {
+  display: none;
+}
+
+.confirmation-overlay,
+.consequence-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+}
+
+.confirmation-overlay {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 75%);
+}
+
+.confirmation-dialog {
+  max-width: 32rem;
+  padding: 24px;
+  border: 1px solid #7700f7;
+  background: var(--surface);
+  color: var(--text-color);
+}
+
+.consequence-overlay {
+  z-index: 10001;
+  display: grid;
+  place-items: end center;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+}
+
+.consequence-overlay img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.consequence-overlay p {
+  position: relative;
+  z-index: 1;
+  max-width: 90%;
+  margin: 0 0 8vh;
+  padding: 12px 20px;
+  background: rgb(0 0 0 / 75%);
+  color: #fff;
+  font-size: clamp(1.1rem, 3vw, 2rem);
+  text-align: center;
+}
+
+.confirmation-overlay[hidden],
+.consequence-overlay[hidden] {
+  display: none;
 }

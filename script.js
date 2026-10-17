@@ -29,7 +29,11 @@ window.figure_stage = 0;
 window.clickSound = new Audio("click.wav");
 window.buttonRolloverSound = new Audio("buttonrollover.wav");
 window.quickSettingsClickSound = new Audio("quicksettingsclick.wav");
+window.settingsClickSound = new Audio("button3.wav");
 window.tadaSound = new Audio("tada_1.mp3");
+window.warnedSound = new Audio("warned.mp3");
+window.ravenholmSound = new Audio("ravenholm_1.mp3");
+window.ravenholmSound.loop = true;
 window.hi = new Audio("WAPP-Hi.wav");
 
 const insufficientFundsAudioContext = new AudioContext();
@@ -63,11 +67,31 @@ function playInsufficientFundsSound(message) {
     });
 }
 
-setInterval(addCps, 1000);
+let gameTickInterval = null;
+
+window.updateGameTick = function() {
+    if (gameTickInterval !== null) {
+        window.clearInterval(gameTickInterval);
+        gameTickInterval = null;
+    }
+
+    if (document.hidden && document.body.classList.contains("potato-mode")) {
+        return;
+    }
+
+    gameTickInterval = window.setInterval(addCps, 1000);
+};
+
+document.addEventListener("visibilitychange", window.updateGameTick);
+window.updateGameTick();
 
 document.addEventListener("mouseover", function(event) {
     const button = event.target.closest("button");
-    if (!button || (event.relatedTarget instanceof Node && button.contains(event.relatedTarget))) {
+    if (
+        !button ||
+        document.body.classList.contains("potato-mode") ||
+        (event.relatedTarget instanceof Node && button.contains(event.relatedTarget))
+    ) {
         return;
     }
 
@@ -217,11 +241,14 @@ class upgrade {
 }
 
 class specializedUpgrade {
-    constructor(name, cost, unlocked, onBuy = null) {
+    constructor(name, cost, unlocked, onBuy = null, options = {}) {
         this.name = name;
         this.cost = cost;
         this.unlocked = unlocked;
         this.onBuy = onBuy;
+        this.requires = options.requires || null;
+        this.unlockThreshold = options.unlockThreshold;
+        this.displayCost = options.displayCost;
     }
 
     buy() {

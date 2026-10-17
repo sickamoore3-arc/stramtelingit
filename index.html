@@ -194,6 +194,8 @@
         <p>&copy; 2026 ඞ</p>
         <button id="debugToggle" onclick="window.toggleDebug()" data-i18n="debugButton">toggle debug</button>
         <button id="settingsButton" type="button" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
+        <button id="dontPressButton" type="button">don't press pls</button>
+        <p id="dontPressResponse" class="dont-press-response" role="status" hidden>good boy!</p>
         <section id="settingsPanel" aria-labelledby="settingsTitle" hidden>
             <h2 id="settingsTitle" data-i18n="settingsTitle">Settings</h2>
             <label for="languageSelect" data-i18n="languageLabel">Language</label>
@@ -212,6 +214,10 @@
                 <label for="soundToggle" data-i18n="soundLabel">Sound</label>
             </div>
             <div>
+                <input type="checkbox" id="darkModeToggle">
+                <label for="darkModeToggle" data-i18n="darkModeLabel">Dark mode</label>
+            </div>
+            <div>
                 <input type="checkbox" id="potatoToggle">
                 <label for="potatoToggle" data-i18n="potatoLabel">Potato mode</label>
                 <span data-i18n="potatoDescription">Reduce visual effects for slower devices.</span>
@@ -219,6 +225,18 @@
             <button id="closeSettingsButton" type="button" data-i18n="closeSettings">Close</button>
         </section>
     </footer>
+
+    <div id="dontPressDialog" class="confirmation-overlay" hidden>
+        <section class="confirmation-dialog" role="dialog" aria-modal="true" aria-labelledby="dontPressQuestion">
+            <p id="dontPressQuestion">are you sure you want to continue? you have been warned</p>
+            <button id="dontPressYes" type="button">Yes</button>
+            <button id="dontPressNo" type="button">No</button>
+        </section>
+    </div>
+    <div id="dontPressConsequence" class="consequence-overlay" hidden>
+        <img src="soldier.jpg" alt="">
+        <p>I told you not to press this, you shall pay the consequences!</p>
+    </div>
 
     <!-- Link to external JavaScript file -->
     <script src="js/upg_functions.js"></script>
